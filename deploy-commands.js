@@ -7,6 +7,7 @@ const commands = [
 	new SlashCommandBuilder().setName('help').setDescription('Replies with help1'),
 	new SlashCommandBuilder().setName('server').setDescription('Replies with server info!'),
 	new SlashCommandBuilder().setName('user').setDescription('Replies with user info!'),
+	new SlashCommandBuilder().setName(`exit`).setDescription('Delete spam @everyone'),
 ]
 	.map(command => command.toJSON());
 
