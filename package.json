@@ -4,7 +4,7 @@
   "description": "bot discord",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon ."
   },
   "repository": {
     "type": "git",
@@ -18,12 +18,14 @@
   "homepage": "https://github.com/Bin-08-01/bot-discord-Tidiots#readme",
   "dependencies": {
     "@discordjs/rest": "^1.1.0",
+    "@discordjs/voice": "^0.11.0",
     "@napi-rs/canvas": "^0.1.29",
     "discord-api-types": "^0.37.5",
     "discord.js": "^14.3.0",
     "dotenv": "^16.0.2"
   },
   "devDependencies": {
-    "eslint": "^8.23.0"
+    "eslint": "^8.23.0",
+    "nodemon": "^2.0.19"
   }
 }
