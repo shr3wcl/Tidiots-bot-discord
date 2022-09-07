@@ -8,6 +8,7 @@ const commands = [
 	new SlashCommandBuilder().setName('server').setDescription('Replies with server info!'),
 	new SlashCommandBuilder().setName('user').setDescription('Replies with user info!'),
 	new SlashCommandBuilder().setName(`exit`).setDescription('Delete spam @everyone'),
+	new SlashCommandBuilder().setName(`test`).setDescription('Delete spam @everyone'),
 ]
 	.map(command => command.toJSON());
 

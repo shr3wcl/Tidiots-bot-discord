@@ -1,13 +1,10 @@
 const Canvas = require('@napi-rs/canvas');
-const { AttachmentBuilder } = require('discord.js');
+const { AttachmentBuilder, PermissionsBitField, GuildMemberManager, PermissionFlagsBits } = require('discord.js');
 const moment = require('moment');
-
 
 const normalCommands = {
     normalCom: (client) => {
         client.on('messageCreate', async (msg) => {
-            console.log(msg.client);
-            // const user = await client.users.fetch(msg.author.id);
             const commandName = msg.content;
             if (commandName.toLowerCase() === '$hello') {
                 await msg.reply(`Good morning ${msg.author.username}!`);
@@ -20,7 +17,7 @@ const normalCommands = {
                 await msg.reply(`Server name: ${msg.guild.name}\nTotal members: ${msg.guild.memberCount}`);
             }
             else if (commandName === '$user') {
-                const date = new Date();
+                const checkAdmin = msg.member.permissions.has(PermissionFlagsBits.Administrator);
                 /*======== Use canvas to draw something ================
                 const canvas = Canvas.createCanvas(100, 100);
                 const context = canvas.getContext('2d');
@@ -32,7 +29,7 @@ const normalCommands = {
                 ======== ============================= ================*/
                 const imageURL = msg.author.avatarURL();
                 await msg.reply({
-                    content: `Your name: ${msg.author.username}#${msg.author.tag}\nMention:${msg.author}\nYour id: ${msg.author.id}\n Created at: ${moment(msg.author.createdAt).format("ll")}\nYour avatar:`, files: [imageURL]
+                    content: `Your name: ${msg.author.tag}\n Admin: ${checkAdmin ? "True" : "False"} \nMention:${msg.author}\nYour id: ${msg.author.id}\n Created at: ${moment(msg.author.createdAt).format("ll")}\nYour avatar:`, files: [imageURL]
                 });
             }
             else if (commandName === '$dis') {
