@@ -6,19 +6,6 @@ const normalCommand = require('./commands/normalCommands');
 const bot = require('./commands/bot');
 const slashCommands = require('./commands/slashCommands');
 
-// const client = new Client({
-// 	intents: [GatewayIntentBits.DirectMessages,
-// 		GatewayIntentBits.Guilds,
-// 		GatewayIntentBits.GuildBans,
-// 		GatewayIntentBits.GuildMessages,
-// 		GatewayIntentBits.MessageContent,
-// 		GatewayIntentBits.GuildVoiceStates,
-// 		GatewayIntentBits.GuildBans,
-// 		GatewayIntentBits.GuildMembers],
-// 	partials: [Partials.Channel],
-// });
-
-
 bot.once('ready', () => {
 	console.log('Bot is Readyyyyyyyy!');
 });

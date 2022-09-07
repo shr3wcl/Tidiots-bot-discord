@@ -1,10 +1,12 @@
 const Canvas = require('@napi-rs/canvas');
 const { AttachmentBuilder } = require('discord.js');
+const moment = require('moment');
 
 
 const normalCommands = {
     normalCom: (client) => {
         client.on('messageCreate', async (msg) => {
+            console.log(msg.client);
             // const user = await client.users.fetch(msg.author.id);
             const commandName = msg.content;
             if (commandName.toLowerCase() === '$hello') {
@@ -18,14 +20,20 @@ const normalCommands = {
                 await msg.reply(`Server name: ${msg.guild.name}\nTotal members: ${msg.guild.memberCount}`);
             }
             else if (commandName === '$user') {
-                const canvas = Canvas.createCanvas(500, 500);
+                const date = new Date();
+                /*======== Use canvas to draw something ================
+                const canvas = Canvas.createCanvas(100, 100);
                 const context = canvas.getContext('2d');
-                const background = await Canvas.loadImage(`https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}.webp`);
+                const background = await Canvas.loadImage(imageURL);
                 context.drawImage(background, 0, 0, canvas.width, canvas.height);
-                const attachment = new AttachmentBuilder(await canvas.encode('webp', 'p'), { name: 'avatar.png' });
-
-                msg.reply(`Your name: ${msg.author.username}\nYour id: ${msg.author.id}\nYour avatar:`);
-                msg.reply({ files: [attachment] });
+                const attachment = new AttachmentBuilder(await canvas.encode('webp', 'gif'), { name: 'avatar.gif' });
+                await msg.channel.send({ content: 'Hello', files: [attachment] });
+                const imageURL = 'https://cdn.discordapp.com/avatars/${msg.author.id}/${msg.author.avatar}.webp';
+                ======== ============================= ================*/
+                const imageURL = msg.author.avatarURL();
+                await msg.reply({
+                    content: `Your name: ${msg.author.username}#${msg.author.tag}\nMention:${msg.author}\nYour id: ${msg.author.id}\n Created at: ${moment(msg.author.createdAt).format("ll")}\nYour avatar:`, files: [imageURL]
+                });
             }
             else if (commandName === '$dis') {
                 await msg.member.voice.disconnect();
