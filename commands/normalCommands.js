@@ -33,7 +33,9 @@ const normalCommands = {
                 ======== ============================= ================*/
                 const imageURL = msg.author.avatarURL();
                 await msg.reply({
-                    content: `Your name: ${msg.author.tag}\n Admin: ${checkAdmin ? "True" : "False"} \nMention:${msg.author}\nYour id: ${msg.author.id}\n Created at: ${moment(msg.author.createdAt).format("ll")}\nYour avatar:`, files: [imageURL]
+                    content: `\`\`\`Your name: ${msg.author.tag}\n Admin: ${checkAdmin ? "True" : "False"} \nMention:${msg.author}\n`+
+                        `Your id: ${msg.author.id}\n Created at: ${moment(msg.author.createdAt).format("ll")}\nYour avatar:`, files: [imageURL],
+                    content: `\`\`\``,
                 });
                 // await msg.channel.send({ files: bannerURL });
             }
@@ -43,17 +45,19 @@ const normalCommands = {
             else if (commandName.split(' ')[0] === '$lich') {
                 const guild = msg.guild;
                 // const idChannel = msg.channel.id;
-                const idChannel = '882088542535290891';
-                const nameEvent = commandName.split(' ')[1];
-                let dateSa = commandName.split(' ')[2];
-                let dateInput = commandName.split(' ')[2].split('/');
-                let time = dateInput[2].split('T');
-                let dateS = `${time[0]}-${dateInput[1]}-${dateInput[0]}T${time[1]}`;
+                const idChannel = '882088542535290891'; //id voicechat 'code' máy chủ 'Hội gaming NĐC'
+                const raw = commandName.split(' ');
+                const nameEvent = raw[1];
+                let dateInput = raw[2];
+                const elementDatehasTime = raw[2].split('/' ?? '-');
+                const time = elementDatehasTime[2].split('T');
+                const dateFormated = `${time[0]}-${elementDatehasTime[1]}-${elementDatehasTime[0]}T${time[1]}`;
                 let dateEnd = commandName.split(' ')[3] ?? null;
                 const description = commandName.split(' ')[4] ?? null;
                 let dateStart = null;
+                const banner = msg.author.avatarURL();
                 try {
-                    dateStart = Date.parse(dateS);
+                    dateStart = Date.parse(dateFormated);
                     dateEnd = Date.parse(dateEnd);
                 } catch (err) {
                     msg.reply('1Structure: $lich <name> <dateStart> <dateEnd(OPTIONAL)>');
@@ -67,8 +71,9 @@ const normalCommands = {
                         description: description,
                         scheduledStartTime: dateStart,
                         scheduledEndTime: dateEnd,
+                        image: banner
                     });
-                    msg.reply(`'${nameEvent}' event scheduled\nStart date: ${dateSa.split('T')[1]} - ${dateSa.split('T')[0]}\n` +
+                    msg.reply(`'${nameEvent}' event scheduled\nStart date: ${dateInput.split('T')[1]} - ${dateInput.split('T')[0]}\n` +
                         `Voice channel: ${msg.channel.name}\n${description ? `Description: ${description}` : ''}`);
                 } catch (err) {
                     console.log(err);
