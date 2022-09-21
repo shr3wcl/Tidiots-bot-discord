@@ -6,9 +6,11 @@ const moment = require('moment');
 const { GuildScheduledEventEntityType } = require("discord-api-types/v8");
 const { now } = require("moment");
 
+
 const normalCommands = {
     normalCom: (client) => {
         client.on('messageCreate', async (msg) => {
+
             const commandName = msg.content;
             if (commandName.toLowerCase() === '$hello') {
                 await msg.reply(`Good morning ${msg.author.username}!`);
@@ -22,6 +24,7 @@ const normalCommands = {
             }
             else if (commandName === '$user') {
                 const checkAdmin = msg.member.permissions.has(PermissionFlagsBits.Administrator);
+
                 /*======== Use canvas to draw something ================
                 const canvas = Canvas.createCanvas(100, 100);
                 const context = canvas.getContext('2d');
@@ -35,7 +38,7 @@ const normalCommands = {
                 await msg.reply({
                     content: `\`\`\`Your name: ${msg.author.tag}\nAdmin: ${checkAdmin ? "True" : "False"} \nMention:${msg.author}\nYour id: ${msg.author.id}\nCreated at: ${moment(msg.author.createdAt).format("ll")}\nYour avatar:\`\`\``, files: [imageURL],
                 });
-                // await msg.channel.send({ files: bannerURL });
+
             }
             else if (commandName === '$dis') {
                 await msg.member.voice.disconnect();
