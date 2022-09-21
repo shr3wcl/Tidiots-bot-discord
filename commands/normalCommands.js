@@ -33,9 +33,7 @@ const normalCommands = {
                 ======== ============================= ================*/
                 const imageURL = msg.author.avatarURL();
                 await msg.reply({
-                    content: `\`\`\`Your name: ${msg.author.tag}\n Admin: ${checkAdmin ? "True" : "False"} \nMention:${msg.author}\n`+
-                        `Your id: ${msg.author.id}\n Created at: ${moment(msg.author.createdAt).format("ll")}\nYour avatar:`, files: [imageURL],
-                    content: `\`\`\``,
+                    content: `\`\`\`Your name: ${msg.author.tag}\nAdmin: ${checkAdmin ? "True" : "False"} \nMention:${msg.author}\nYour id: ${msg.author.id}\nCreated at: ${moment(msg.author.createdAt).format("ll")}\nYour avatar:\`\`\``, files: [imageURL],
                 });
                 // await msg.channel.send({ files: bannerURL });
             }
@@ -79,6 +77,16 @@ const normalCommands = {
                     console.log(err);
                     msg.reply('Structure: $lich <name> <dateStart> <dateEnd(OPTIONAL)>');
                 }
+            }
+            else if (commandName.split(' ')[0] == '$spam') {
+                for (let i = 0; i < parseInt(commandName.split(' ')[1]); ++i) {
+                    await setTimeout(() => msg.channel.send('$s'), 5000);
+                }
+            }
+            else if (commandName === '$rickroll') {
+                const im = "https://images4.fanpop.com/image/photos/22700000/Rick-Rolling-Win-rickrolld-22704848-250-217.gif";
+                const a = "https://stream.nixcdn.com/Sony_Audio59/NeverGonnaGiveYouUp-RickAstley-5890955.mp3?st=OLR48deuiWZTedRu3PUT8w&e=1662707548&t=1662621108041";
+                await msg.channel.send({ content: "I'm coming back...", files: [im, a] });
             }
         });
     }
