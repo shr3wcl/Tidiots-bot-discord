@@ -6,13 +6,6 @@ const splashCommands = {
     slashCommand: (client) => {
         client.on('interactionCreate', async interaction => {
 
-            const checkAdmin = interaction.member.permissions.has(PermissionFlagsBits.Administrator);
-            const usernameAndTag = interaction.user.tag;
-            const mention = interaction.user;
-            const idUser = interaction.user.id;
-            const dateCreatedAtFormated = moment(interaction.user.createdAt).format("ll");
-
-
             if (!interaction.isChatInputCommand()) return;
 
             const { commandName } = interaction;
@@ -25,9 +18,15 @@ const splashCommands = {
                 await interaction.reply(`Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`);
             }
             else if (commandName === 'user') {
-                const imageURL = interaction.user.avatarURL();
+                const user = interaction.options.getUser('target');
+                const checkAdmin = interaction.member.permissions.has(PermissionFlagsBits.Administrator);
+                const usernameAndTag = user?.tag;
+                const mention = user;
+                const idUser = user?.id;
+                const dateCreatedAtFormated = moment(user?.createdAt).format("ll");
+                const imageURL = user.avatarURL();
                 await interaction.reply({
-                    content: `Your name: ${usernameAndTag}\n Admin: ${checkAdmin ? "True" : "False"} \nMention: ${mention}\nYour id: ${idUser}\n Created at: ${dateCreatedAtFormated}\nYour avatar:`, files: [imageURL]
+                    content: `Name: ${usernameAndTag}\nAdmin: ${checkAdmin ? "True" : "False"} \nMention: ${mention}\nId: ${idUser}\nCreated at: ${dateCreatedAtFormated}\nAvatar:`, files: [imageURL]
                 });
             }
             else if (commandName === 'exit') {
