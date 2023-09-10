@@ -1,1 +1,2 @@
-# Tidiots
+# WolfDiscord
+ Werewolves Bot Discord

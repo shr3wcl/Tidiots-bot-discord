@@ -1,0 +1,41 @@
+{
+    "wolf": {
+        "imgUrl": "https://static.wikia.nocookie.net/wwo-vietnamese/images/a/af/Icon_werewolf_filled.png/revision/latest/scale-to-width-down/220?cb=20191121121028&path-prefix=vi",
+        "en": {
+            "name": "Wolf",
+            "description": "Your goal is to kill all the villagers to win the battle with the other wolves.",
+            "faction": "Evil"
+        },
+        "vi": {
+            "name": "Sói",
+            "description": "Mục tiêu của bạn là giết hết tất cả dân làng để dành chiến thắng cùng những con sói khác",
+            "faction": "Ác"
+        }
+    },
+    "village": {
+        "imgUrl": "https://static.wikia.nocookie.net/wwo-vietnamese/images/0/07/Icon_villager_filled.png/revision/latest/scale-to-width-down/350?cb=20191027112349&path-prefix=vi",
+        "en": {
+            "name": "Villager",
+            "description": "You are a normal villager with no special function.",
+            "faction": "Good"
+        },
+        "vi": {
+            "name": "Dân làng",
+            "description": "Bạn là một dân làng bình thường không có chức năng gì đặc biệt",
+            "faction": "Thiện"
+        }
+    },
+    "witch": {
+        "imgUrl": "https://static.wikia.nocookie.net/wwo-vietnamese/images/6/6e/Icon_witch_filled.png/revision/latest/scale-to-width-down/220?cb=20191107182714&path-prefix=vi",
+        "en": {
+            "name": "Witch",
+            "description": "You have two potions: One for killing and the other for protecting the player. The protection potion is only consumed if that player is attacked. You cannot kill the first night.",
+            "faction": "Good"
+        },
+        "vi": {
+            "name": "Phù thuỷ",
+            "description": "Bạn có hai bình thuốc: Một bình dùng để giết và bình kia để bảo vệ người chơi. Bình bảo vệ chỉ được tiêu thụ nếu người chơi đó bị tấn công. Bạn không thể giết trong đêm đầu tiên.",
+            "faction": "Thiện"
+        }
+    }
+}
