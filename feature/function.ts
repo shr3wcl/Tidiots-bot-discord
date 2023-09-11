@@ -2,9 +2,11 @@ import { Client, EmbedBuilder, TextChannel } from "discord.js";
 import { createEmbed } from "./component";
 
 export const sleep = (second: number, callback: any) => {
-    return new Promise(resolve => {
+    
+    const promise = new Promise(resolve => {
         setTimeout(() => { resolve(callback); }, second * 1000);
     })
+    return promise;
 }
 
 export const countDown = async (second: number = 0, message: string, channel: TextChannel, client: Client | null = null, idPlayer: string | null = null) =>{

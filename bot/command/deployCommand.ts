@@ -41,6 +41,11 @@ const musicCommands: Array<RESTPostAPIChatInputApplicationCommandsJSONBody> = [
     new SlashCommandBuilder().setName("play").setDescription("Check bot!")
         .addStringOption(option => option.setName('url').setDescription("Url youtube").setRequired(true)),
     new SlashCommandBuilder().setName("quit").setDescription("Remove bot out of channel!"),
+    new SlashCommandBuilder().setName("list").setDescription("List music"),
+    new SlashCommandBuilder().setName("pause").setDescription("Pause bot music"),
+    new SlashCommandBuilder().setName("unpause").setDescription("Unpause bot music"),
+    new SlashCommandBuilder().setName("next").setDescription("Next"),
+    new SlashCommandBuilder().setName("clear").setDescription("Clear list musics")
 ].map(command => command.toJSON());
 
 export const registerSlashCommand = (guildId: string) => {

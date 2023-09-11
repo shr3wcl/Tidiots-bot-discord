@@ -1,20 +1,29 @@
 import { CacheType, Interaction, GuildMember, EmbedBuilder, ChatInputCommandInteraction } from "discord.js";
-import { joinVoiceChannel, createAudioResource, createAudioPlayer, AudioPlayerStatus } from "@discordjs/voice";
+import { joinVoiceChannel, createAudioResource, createAudioPlayer, AudioPlayerStatus, AudioPlayer, VoiceConnection } from "@discordjs/voice";
 import ytdl = require('ytdl-core');
 import { sleep } from "../feature/function";
 import { createEmbed } from "../feature/component";
 
+type Music = {
+    url: string;
+    title: string;
+    author: string;
+    thumbnail: string
+}
 
 class MusicObject  {
     private idChannel: string;
-    private listUrl: Array<string> =  [];
+    private listMusic: Music[] =  [];
     private guildId: string;
     private interaction: ChatInputCommandInteraction<CacheType>;
-    private connection: any;
+    private connection: VoiceConnection;
+    private player: AudioPlayer;
+    private timeToLive: number = 0;
+    private currentUrl: string;
 
     constructor(idCh: string, url: string, idG: string, inter: ChatInputCommandInteraction<CacheType>) {
         this.idChannel = idCh;
-        this.listUrl.push(url);
+        this.currentUrl = url;
         this.guildId = idG;
         this.interaction = inter;
     }
@@ -24,12 +33,30 @@ class MusicObject  {
     }
 
     async addUrl(url: string, interact: ChatInputCommandInteraction<CacheType>) {
-        this.listUrl.unshift(url);
-        const { videoDetails } = await ytdl.getInfo(url);
-        const embed = createEmbed(videoDetails.title, `Đã thêm **${videoDetails.title}** của **${videoDetails.author.name}** vào danh sách phát của kênh này`, videoDetails.thumbnails[0].url, videoDetails.video_url)
-        await interact.reply({
-            embeds: [embed]
-        });
+        let embed: EmbedBuilder;
+        try{
+            const { videoDetails } = await ytdl.getInfo(url);
+            this.listMusic.unshift({
+                url: url,
+                title: videoDetails.title,
+                author: videoDetails.author.name,
+                thumbnail: videoDetails.thumbnails[0].url
+            });
+            embed = createEmbed(`**Đã thêm** ${videoDetails.title}`, `Đã thêm **${videoDetails.title}** của **${videoDetails.author.name}** vào danh sách phát của kênh này`, videoDetails.thumbnails[0].url, videoDetails.video_url);
+        }catch(err){
+            embed = createEmbed("Không thể tìm thấy đường dẫn", "Không thể tìm thấy đường dẫn, hoặc đường dẫn không hợp lệ, vui lòng thử lại");
+        }
+
+        try{
+            await interact.reply({
+                embeds: [embed]
+            });
+        }catch(err){
+            await interact.channel.send({
+                embeds: [embed]
+            });
+        }
+        this.timeToLive = -100;
     }
 
     async quit(interact: ChatInputCommandInteraction<CacheType>){
@@ -40,82 +67,131 @@ class MusicObject  {
         })
     }
     
-    // Develop features: list, next, stop, continue, remove
     async list(interact: ChatInputCommandInteraction<CacheType>) {
-        const urlTable = "";
-        this.listUrl.forEach(async (url: string) => {
-             const { videoDetails } = await ytdl.getInfo(url);
-
+        let urlTable = "";
+        let embed: EmbedBuilder;
+        if (this.listMusic.length !== 0) {
+            this.listMusic.forEach(async (music: Music, index) => {
+                urlTable += `${index+1}. [**${music.title}**](${music.url})` + `\n[${music.author}](${music.url})` + "\n";
+            });
+            embed = createEmbed("Danh sách phát", `${urlTable}`);
+        } else {
+            embed = createEmbed("Danh sách phát trống", "Hiện trong danh sách không có bài hát nào");
+        }
+        await interact.reply({
+            embeds: [embed]
         });
     }
 
-    async next() {
-
+    async next(interact: ChatInputCommandInteraction<CacheType> = this.interaction) {
+        this.player.stop();
+        const embed = createEmbed("Đang phát danh sách phát tiếp theo", "Đang phát danh sách phát tiếp theo");
+        try{
+            await interact.reply({
+                embeds: [embed]
+            })
+        }catch(err){
+            await interact.channel.send({
+                embeds: [embed]
+            });
+        }            
     }
 
-    async stop() {
-
+    async pause(interact: ChatInputCommandInteraction<CacheType>) {
+        this.player.pause();
+        const embed = createEmbed("Đã tạm dừng danh sách phát", `Tạm dừng danh sách phát`);
+        await interact.reply({
+            embeds: [embed]
+        })
     }
 
-    async continue() {
-
+    async unpause(interact: ChatInputCommandInteraction<CacheType>) {
+        this.player.unpause();
+        const embed = createEmbed("Tiếp tục phát danh sách", `Tiếp tục phát danh sách`);
+        await interact.reply({
+            embeds: [embed]
+        })
     }
 
-    async remove() {
-
+    async clear(interact: ChatInputCommandInteraction<CacheType>) {
+        this.listMusic = [];
+        this.next();
+        const embed = createEmbed("Đã làm trống danh sách phát", "Danh sách phát đã được làm trống");
+        await interact.reply({embeds: [embed]});
     }
+
+    async checkTTL(){
+        if (this.listMusic.length === 0){
+            this.timeToLive = 1;
+            const embed = createEmbed("Danh sách phát trống trơn!", `Danh sách phát đã hết, hãy thêm vào để tiếp tục...`);
+            await this.interaction.channel.send({
+                embeds: [embed]
+            });
+            const timeLive = setInterval(async () => {
+                if (this.timeToLive <= 0){
+                    clearInterval(timeLive);
+                    this.play(this.listMusic[0]);
+                }
+                if (this.timeToLive >= 60){
+                    const embed = createEmbed("Tạm biệt!", "Do không hoạt động trong thời gian dài nên bot đã rời khỏi phòng, bạn vẫn có thể gọi lại bot ...");
+                    await this.interaction.channel.send({
+                        embeds: [embed]
+                    });
+                    clearInterval(timeLive);
+                    this.connection.disconnect();
+                }
+                this.timeToLive += 1;
+            }, 1000);
+        } else{
+            this.play(this.listMusic[0]);
+        }
+    }
+
+    async play(music: Music) {     
+        try{
+            const stream = ytdl(music.url, { filter: 'audioonly', highWaterMark: 1 << 25, quality: 'highestaudio' });
+            const resource = createAudioResource(stream, { inlineVolume: true });
+            this.player.play(resource);
+            this.connection.subscribe(this.player);
+
+            this.player.on("error", (error) => {
+                this.next();
+            })
+
+            this.player.on("stateChange", async (oldState, newState) => {
+                if (newState.status === "idle"){
+                    this.listMusic.pop();
+                    await this.checkTTL();
+                }
+            })
+        }catch(err){
+            const embed = createEmbed("Không thể phát", "Đường dẫn có một số vấn đề nên không thể phát bài hát hiện tại, vui lòng thử lại");
+            await this.interaction.channel.send({embeds:[embed]});
+            this.listMusic.pop();
+            await this.checkTTL();
+        }
+    }
+
+
 
     async start() {
+        this.player = createAudioPlayer();
         try {
             this.connection = joinVoiceChannel({
                 channelId: this.idChannel,
                 guildId: this.guildId,
                 adapterCreator: this.interaction.guild.voiceAdapterCreator,
             });
+            
         } catch (error) {
             await this.interaction.channel.send("Không thể kết nối đến kênh thoại"); 
         }
-        while (true) {
-            if(this.listUrl.length == 0){
-                break;
-            }
-            try {
-                const url = this.listUrl.pop();
-
-                const stream = ytdl(url, { filter: 'audioonly', highWaterMark: 1 << 25, quality: 'highestaudio' });
-                const { videoDetails } = await ytdl.getInfo(url);
-                const resource = createAudioResource(stream, { inlineVolume: true });
-                const player = createAudioPlayer();
-                player.play(resource);
-                this.connection.subscribe(player);
-
-                player.on(AudioPlayerStatus.Idle, () => {
-                    // connection.destroy();
-                });
-    
-                const embed = createEmbed(videoDetails.title, `Đang phát **${videoDetails.title}** của **${videoDetails.author.name}**`, videoDetails.thumbnails[0].url, videoDetails.video_url);
-
-                try {
-                    await this.interaction.reply({
-                        embeds: [embed]
-                    });
-                } catch (error) {
-                    await this.interaction.channel.send({
-                        embeds: [embed]
-                    })
-                } 
-                await sleep(parseInt(videoDetails.lengthSeconds) + 5, "Oke");
-            } catch (error) {
-                console.log(error);
-                break;
-            }
-        }
-        const embed = createEmbed("Danh sách phát trống trơn!", `Danh sách phát đã hết, hãy thêm vào để tiếp tục...`);
-
-        await this.interaction.channel.send({
+        const embed = createEmbed("Xin chào", "Vui lòng đợi trong giây lát, bot sẽ phục vụ liền ^^");
+        await this.interaction.reply({
             embeds: [embed]
-        });
-        this.connection.destroy();
+        })
+        await this.addUrl(this.currentUrl, this.interaction);  
+        this.play(this.listMusic[0]);
     }
 }
 
