@@ -2,7 +2,7 @@ import { CacheType, Client, GuildMember, Interaction, EmbedBuilder } from "disco
 import { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } from '@discordjs/voice';
 import ytdl = require('ytdl-core');
 import MusicObject from "../../../music/MusicObject";
-import listChannel from "../../../music/ListMusic";
+import { listChannel } from "../../../music/ListMusic";
 
 
 const musicCommands = {

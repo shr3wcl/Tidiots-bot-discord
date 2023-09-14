@@ -3,6 +3,7 @@ import { joinVoiceChannel, createAudioResource, createAudioPlayer, AudioPlayerSt
 import ytdl = require('ytdl-core');
 import { sleep } from "../feature/function";
 import { createEmbed } from "../feature/component";
+import { listChannel } from "./ListMusic";
 
 type Music = {
     url: string;
@@ -61,6 +62,11 @@ class MusicObject  {
 
     async quit(interact: ChatInputCommandInteraction<CacheType>){
         this.connection.destroy();
+        listChannel.forEach( (e, index) => {
+            if ( e.getId() === this.idChannel ){
+                listChannel.splice(index, 1);
+            }
+        });
         const embed = createEmbed("Bot đã rời khỏi phòng!", `Tạm biệt, hẹn gặp lại.`);
         await interact.reply({
             embeds: [embed]
@@ -139,6 +145,11 @@ class MusicObject  {
                     });
                     clearInterval(timeLive);
                     this.connection.disconnect();
+                    listChannel.forEach( (e, index) => {
+                        if ( e.getId() === this.idChannel ){
+                            listChannel.splice(index, 1);
+                        }
+                    });
                 }
                 this.timeToLive += 1;
             }, 1000);
@@ -171,8 +182,6 @@ class MusicObject  {
             await this.checkTTL();
         }
     }
-
-
 
     async start() {
         this.player = createAudioPlayer();
